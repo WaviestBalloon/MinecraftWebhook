@@ -1,14 +1,14 @@
 [
 {
-  "modid": "examplemod",
-  "name": "Example Mod",
-  "description": "Example placeholder mod.",
+  "modid": "joinleavewebhooks",
+  "name": "Join+Leave+ServerState+Chat Discord Webhook",
+  "description": "A mod to relay player joins, leaving, chatting and also when the server is available to join or if the server is closing",
   "version": "${version}",
   "mcversion": "${mcversion}",
   "url": "",
   "updateUrl": "",
-  "authorList": ["ExampleDude"],
-  "credits": "The Forge and FML guys, for making this example",
+  "authorList": ["waviestballoonx9"],
+  "credits": "The Forge and FML guys",
   "logoFile": "",
   "screenshots": [],
   "dependencies": []
