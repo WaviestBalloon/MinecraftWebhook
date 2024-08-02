@@ -17,7 +17,10 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.time.Instant;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 import static com.nanokoindustries.joinleavewebhooks.ConfigHandler.initConfig;
 import static com.nanokoindustries.joinleavewebhooks.Webhook.sendDiscordWebhookRequestThreaded;
@@ -32,6 +35,7 @@ public class JoinLeaveWebhooks
 
     public static Logger logger;
     public static Boolean currentlyShuttingDown = false;
+    public static Map<UUID, Long> playerPlaytimeActivity = new HashMap<UUID, Long>();
 
     @EventHandler
     public void preInit(FMLPreInitializationEvent event) {
@@ -85,7 +89,14 @@ public class JoinLeaveWebhooks
                     break;
                 case "PlayerEvent$PlayerLoggedOutEvent":
                     PlayerEvent.PlayerLoggedOutEvent playerLoggedOutEvent = (PlayerEvent.PlayerLoggedOutEvent) eventData;
+                    UUID playerUUID = playerLoggedOutEvent.player.getUniqueID();
+                    Long currentSessionPlaytime = playerPlaytimeActivity.get(playerUUID);
+                    Long currentTimestamp = Instant.now().toEpochMilli();
+
                     formatted = formatted.replaceAll("%playername%", playerLoggedOutEvent.player.getName());
+                    formatted = formatted.replaceAll("%playtime%", ms.format(currentTimestamp - currentSessionPlaytime));
+                    formatted = formatted.replaceAll("%rawplaytime%", String.valueOf(currentTimestamp - currentSessionPlaytime));
+                    playerPlaytimeActivity.remove(playerUUID);
                     break;
                 case "LivingDeathEvent":
                     LivingDeathEvent livingDeathEvent = (LivingDeathEvent) eventData;
@@ -154,6 +165,7 @@ public class JoinLeaveWebhooks
                 ITextComponent WarningMessage = CommandHandler.createChatMessage(String.format("§c§l/!\\ Server Configuration Warning!\n§cYou have not provided a Discord webhook URL in the mod's configuration file, any events that trigger a webhook will not succeed until you provide one.\n\n§cThe configuration file is located at: §c§o%s", ConfigHandler.Config.ConfigurationFullLocation));
                 event.player.sendMessage(WarningMessage);
             }
+            playerPlaytimeActivity.put(event.player.getUniqueID(), Instant.now().toEpochMilli());
 
             if (!ConfigHandler.Config.TriggerOnPlayerJoin || currentlyShuttingDown) return;
             sendDiscordWebhookRequestThreaded(formatMessageContentBasedOnLayout(ConfigHandler.Config.PlayerJoinLayout, Optional.of(event)), Optional.of(ConfigHandler.Config.PlayerJoinLayoutUseEmbed), Optional.of(event.player.getUniqueID()), Optional.empty());

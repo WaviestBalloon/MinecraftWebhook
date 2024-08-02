@@ -57,7 +57,7 @@ public class ConfigHandler {
         configuration.addCustomCategoryComment(category, "Configure what gets send through the webhooks, you can use Discord formatting outlined here: https://support.discord.com/hc/en-us/articles/210298617-Markdown-Text-101-Chat-Formatting-Bold-Italic-Underline");
         Config.PlayerJoinLayout = configuration.getString("PlayerJoinLayout", category, "➡\uFE0F <t:%epoch%:R>\\n`%playername%` joined the game.", "What to send when a player joins");
         Config.PlayerJoinLayoutUseEmbed = configuration.getBoolean("PlayerJoinLayoutUseEmbed", category, true, "Put the above in a embed instead of a generic message");
-        Config.PlayerLeaveLayout = configuration.getString("PlayerLeaveLayout", category, "\uD83D\uDEAA <t:%epoch%:R>\\n`%playername%` left the game.", "What to send when a player leaves");
+        Config.PlayerLeaveLayout = configuration.getString("PlayerLeaveLayout", category, "\uD83D\uDEAA <t:%epoch%:R>\\n`%playername%` left the game.\\nPlayed for %playtime% (`%rawplaytime%ms`)", "What to send when a player leaves");
         Config.PlayerLeaveLayoutUseEmbed = configuration.getBoolean("PlayerLeaveLayoutUseEmbed", category, true, "Put the above in a embed instead of a generic message");
         Config.PlayerChatLayout = configuration.getString("PlayerChatLayout", category, "\uD83D\uDCAC <t:%epoch%:R>\\n`%playername%`: %chatmessage%", "What to send when a player sends a message in chat");
         Config.PlayerChatLayoutUseEmbed = configuration.getBoolean("PlayerChatLayoutUseEmbed", category, true, "Put the above in a embed instead of a generic message");
