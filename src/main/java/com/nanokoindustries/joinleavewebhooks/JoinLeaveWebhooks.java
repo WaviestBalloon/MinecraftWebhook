@@ -4,9 +4,9 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraftforge.common.config.Config;
-import net.minecraftforge.event.CommandEvent;
 import net.minecraftforge.event.ServerChatEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
+import net.minecraftforge.event.entity.player.AdvancementEvent;
 import net.minecraftforge.fml.common.event.*;
 import net.minecraftforge.fml.common.eventhandler.Event;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
@@ -17,7 +17,6 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.time.Instant;
-import java.util.Arrays;
 import java.util.Optional;
 
 import static com.nanokoindustries.joinleavewebhooks.ConfigHandler.initConfig;
@@ -32,6 +31,7 @@ public class JoinLeaveWebhooks
     public static final String VERSION = "1.0";
 
     public static Logger logger;
+    public static Boolean currentlyShuttingDown = false;
 
     @EventHandler
     public void preInit(FMLPreInitializationEvent event) {
@@ -43,6 +43,7 @@ public class JoinLeaveWebhooks
     @EventHandler
     public void init(FMLInitializationEvent event) {
         logger.info("[NanokoIndustries] Join+Leave+ServerState+Chat Discord Webhook mod initialised!");
+        logger.info("Mod created by Nanoko Industries - Leaders in, making crappy mods? I have no idea...");
 
         if (ConfigHandler.Config.DiscordWebhookToken.isEmpty()) {
             logger.error("The webhook URL is empty! Edit your configuration file located in the \"config\" folder in the server files");
@@ -51,7 +52,9 @@ public class JoinLeaveWebhooks
 
     @EventHandler
     public void commandSetup(FMLServerStartingEvent event) {
-        event.registerServerCommand(new ConfigHandler.ReloadCommand());
+        logger.info("Registering server commands...");
+        event.registerServerCommand(new CommandHandler.ReloadCommand());
+
     }
 
     private static int getFormattedEpochForTimestampMarkdown() {
@@ -87,7 +90,7 @@ public class JoinLeaveWebhooks
                 case "LivingDeathEvent":
                     LivingDeathEvent livingDeathEvent = (LivingDeathEvent) eventData;
                     EntityPlayer deadPlayer = (EntityPlayer) livingDeathEvent.getEntity();
-                    String killer = livingDeathEvent.getSource().getDeathMessage(deadPlayer).getFormattedText().replaceAll("§r", "");
+                    String killer = livingDeathEvent.getSource().getDeathMessage(deadPlayer).getUnformattedText();
 
                     formatted = formatted.replaceAll("%deathmessage%", killer);
                     break;
@@ -109,6 +112,16 @@ public class JoinLeaveWebhooks
                     formatted = formatted.replaceAll("%playername%", player.getName());
                     formatted = formatted.replaceAll("%chatmessage%", cleanedMessage);
                     break;
+                case "AdvancementEvent":
+                    AdvancementEvent advancementEvent = (AdvancementEvent) eventData;
+                    EntityPlayer playerGot = advancementEvent.getEntityPlayer();
+                    String advancementName = ((AdvancementEvent) eventData).getAdvancement().getDisplayText().getUnformattedText(); // what
+                    String cleanAdvancementName = advancementName.replaceAll("\\[", "");
+                    cleanAdvancementName = cleanAdvancementName.replaceAll("]", "");
+
+                    formatted = formatted.replaceAll("%playername%", playerGot.getName());
+                    formatted = formatted.replaceAll("%advancementname%", cleanAdvancementName);
+                    break;
                 default:
             }
         }
@@ -121,15 +134,16 @@ public class JoinLeaveWebhooks
         if (!ConfigHandler.Config.TriggerOnServerInitialised) return;
 
         logger.info("Server opened event triggered!");
-        sendDiscordWebhookRequestThreaded(formatMessageContentBasedOnLayout(ConfigHandler.Config.ServerInitialisedLayout, Optional.empty()), Optional.empty(), Optional.empty());
+        sendDiscordWebhookRequestThreaded(formatMessageContentBasedOnLayout(ConfigHandler.Config.ServerInitialisedLayout, Optional.empty()), Optional.of(ConfigHandler.Config.ServerInitialisedLayoutUseEmbed), Optional.empty(), Optional.empty());
     }
 
     @EventHandler
     public void closure(FMLServerStoppingEvent event) {
+        currentlyShuttingDown = true;
         if (!ConfigHandler.Config.TriggerOnServerClosing) return;
 
         logger.info("Server closing event triggered!");
-        sendDiscordWebhookRequestThreaded(formatMessageContentBasedOnLayout(ConfigHandler.Config.ServerClosingLayout, Optional.empty()), Optional.empty(), Optional.empty());
+        sendDiscordWebhookRequestThreaded(formatMessageContentBasedOnLayout(ConfigHandler.Config.ServerClosingLayout, Optional.empty()), Optional.of(ConfigHandler.Config.ServerClosingLayoutUseEmbed), Optional.empty(), Optional.empty());
     }
 
     @Mod.EventBusSubscriber
@@ -137,44 +151,50 @@ public class JoinLeaveWebhooks
         @SubscribeEvent
         public static void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event) {
             if (ConfigHandler.Config.DiscordWebhookToken.isEmpty()) {
-                ITextComponent WarningMessage = new TextComponentString(String.format("§2[JoinLeaveWebhooks]§c§l /!\\ Server Configuration Warning!\n§cYou have not provided a Discord webhook URL in the mod's configuration file, any events that trigger a webhook will not succeed until you provide one.\n\n§cThe configuration file is located at: §c§o%s", ConfigHandler.Config.ConfigurationFullLocation));
+                ITextComponent WarningMessage = CommandHandler.createChatMessage(String.format("§c§l/!\\ Server Configuration Warning!\n§cYou have not provided a Discord webhook URL in the mod's configuration file, any events that trigger a webhook will not succeed until you provide one.\n\n§cThe configuration file is located at: §c§o%s", ConfigHandler.Config.ConfigurationFullLocation));
                 event.player.sendMessage(WarningMessage);
             }
 
-            if (!ConfigHandler.Config.TriggerOnPlayerJoin) return;
-            sendDiscordWebhookRequestThreaded(formatMessageContentBasedOnLayout(ConfigHandler.Config.PlayerJoinLayout, Optional.of(event)), Optional.of(true), Optional.of(event.player.getUniqueID()));
+            if (!ConfigHandler.Config.TriggerOnPlayerJoin || currentlyShuttingDown) return;
+            sendDiscordWebhookRequestThreaded(formatMessageContentBasedOnLayout(ConfigHandler.Config.PlayerJoinLayout, Optional.of(event)), Optional.of(ConfigHandler.Config.PlayerJoinLayoutUseEmbed), Optional.of(event.player.getUniqueID()), Optional.empty());
         }
 
         @SubscribeEvent
         public static void onPlayerLeave(PlayerEvent.PlayerLoggedOutEvent event) {
-            if (!ConfigHandler.Config.TriggerOnPlayerLeave) return;
-            sendDiscordWebhookRequestThreaded(formatMessageContentBasedOnLayout(ConfigHandler.Config.PlayerLeaveLayout, Optional.of(event)), Optional.of(true), Optional.of(event.player.getUniqueID()));
+            if (!ConfigHandler.Config.TriggerOnPlayerLeave || currentlyShuttingDown) return;
+            sendDiscordWebhookRequestThreaded(formatMessageContentBasedOnLayout(ConfigHandler.Config.PlayerLeaveLayout, Optional.of(event)), Optional.of(ConfigHandler.Config.PlayerLeaveLayoutUseEmbed), Optional.of(event.player.getUniqueID()), Optional.empty());
         }
 
         @SubscribeEvent
         public static void onPlayerChat(ServerChatEvent event) {
-            if (!ConfigHandler.Config.TriggerOnPlayerChat) return;
+            if (!ConfigHandler.Config.TriggerOnPlayerChat || currentlyShuttingDown) return;
             EntityPlayer player = event.getPlayer();
 
             if (event.getPlayer() != null) {
-                sendDiscordWebhookRequestThreaded(formatMessageContentBasedOnLayout(ConfigHandler.Config.PlayerChatLayout, Optional.of(event)), Optional.of(true), Optional.of(player.getUniqueID()));
+                sendDiscordWebhookRequestThreaded(formatMessageContentBasedOnLayout(ConfigHandler.Config.PlayerChatLayout, Optional.of(event)), Optional.of(ConfigHandler.Config.PlayerChatLayoutUseEmbed), Optional.of(player.getUniqueID()), Optional.empty());
             }
         }
 
         @SubscribeEvent
         public static void onPlayerDeath(LivingDeathEvent event) {
-            if (!ConfigHandler.Config.TriggerOnPlayerDeath) return;
+            if (!ConfigHandler.Config.TriggerOnPlayerDeath || currentlyShuttingDown) return;
             if (!(event.getEntity() instanceof EntityPlayer)) return;
-
             EntityPlayer deadPlayer = (EntityPlayer) event.getEntity();
-            String killer = event.getSource().getDeathMessage(deadPlayer).getFormattedText().replaceAll("§r", "");
 
-            sendDiscordWebhookRequestThreaded(formatMessageContentBasedOnLayout(ConfigHandler.Config.PlayerDeathLayout, Optional.of(event)), Optional.of(false), Optional.of(deadPlayer.getUniqueID()));
+            sendDiscordWebhookRequestThreaded(formatMessageContentBasedOnLayout(ConfigHandler.Config.PlayerDeathLayout, Optional.of(event)), Optional.of(ConfigHandler.Config.PlayerDeathLayoutUseEmbed), Optional.of(deadPlayer.getUniqueID()), Optional.empty());
         }
 
         @SubscribeEvent
-        public static void onPlayerCommandExecute(CommandEvent event) {
-            logger.warn(event);
+        public static void onPlayerAchievement(AdvancementEvent event) {
+            if (!ConfigHandler.Config.TriggerOnPlayerAdvancement || currentlyShuttingDown) return;
+            String advancementName = event.getAdvancement().getDisplayText().getUnformattedText();
+            if (advancementName.contains(":recipes/")) {
+                logger.warn("Ignoring `recipes` advancement as it is not a proper advancement: {}...", advancementName);
+                return;
+            }
+            EntityPlayer player = event.getEntityPlayer();
+
+            sendDiscordWebhookRequestThreaded(formatMessageContentBasedOnLayout(ConfigHandler.Config.PlayerAdvancementLayout, Optional.of(event)), Optional.of(ConfigHandler.Config.PlayerAdvancementLayoutUseEmbed), Optional.of(player.getUniqueID()), Optional.empty());
         }
     }
 }
