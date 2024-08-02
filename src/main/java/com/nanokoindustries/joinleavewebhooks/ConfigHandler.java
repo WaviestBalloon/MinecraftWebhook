@@ -20,6 +20,7 @@ public class ConfigHandler {
         public static Boolean AllowMentions;
         public static String UserAgent;
         public static Boolean EnableWebhookHandlerDebugging;
+        public static Boolean SanitiseChatMessages;
 
         public static String PlayerJoinLayout;
         public static String DiscordWebhookToken = "";
@@ -62,6 +63,7 @@ public class ConfigHandler {
         configuration.addCustomCategoryComment(category, "Configure webhooks here");
         Config.DiscordWebhookToken = configuration.getString("DiscordWebhookURL", category, "", "DO NOT SHARE THIS URL WITH ANYONE");
         Config.AllowMentions = configuration.getBoolean("AllowMentions", category, false, "Determines whether the messages have the ability to ping members or ping everyone");
+        Config.SanitiseChatMessages = configuration.getBoolean("SanitiseChatMessages", category, true, "Removes Discord markdown from player chat messages");
         Config.UserAgent = configuration.getString("UserAgent", category, "Java Minecraft Forge dedicated server", "The User-Agent identifier used to make the request, you shouldn't need to change this");
         Config.EnableWebhookHandlerDebugging = configuration.getBoolean("EnableWebhookHandlerDebugging", category, false, "Enables logging outputs for the Webhook handler, might get a bit spammy");
 

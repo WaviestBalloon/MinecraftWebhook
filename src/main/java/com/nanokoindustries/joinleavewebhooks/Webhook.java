@@ -60,7 +60,7 @@ public class Webhook {
                     JsonObject jsonEmbedThumbnailObject = new JsonObject();
                     jsonEmbed.addProperty("description", MessageContent);
 
-                    jsonEmbedThumbnailObject.addProperty("url", String.format("https://mc-heads.net/head/%s", PlayerUUID));
+                    jsonEmbedThumbnailObject.addProperty("url", String.format("https://mc-heads.net/head/%s/1", PlayerUUID));
                     jsonEmbed.add("thumbnail", jsonEmbedThumbnailObject);
 
                     jsonEmbedsArray.add(jsonEmbed);

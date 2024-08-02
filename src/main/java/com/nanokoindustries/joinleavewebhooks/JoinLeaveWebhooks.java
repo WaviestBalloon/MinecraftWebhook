@@ -96,15 +96,23 @@ public class JoinLeaveWebhooks
                     ServerChatEvent serverChatEvent = (ServerChatEvent) eventData;
                     EntityPlayer player = serverChatEvent.getPlayer();
                     String message = serverChatEvent.getMessage();
+                    String cleanedMessage = message.replaceAll("\n", "\\\\n"); // clean out special chars so players cannot do funny formatting in messages
+                    if (ConfigHandler.Config.SanitiseChatMessages) {
+                        logger.info("Sanitising chat message content...");
+                        cleanedMessage = cleanedMessage.replaceAll("`", "\\\\\\\\`");
+                        cleanedMessage = cleanedMessage.replaceAll("\\*", "\\\\\\\\*");
+                        cleanedMessage = cleanedMessage.replaceAll("~", "\\\\\\\\~");
+                        cleanedMessage = cleanedMessage.replaceAll("_", "\\\\\\\\_");
+                    }
+                    logger.warn(message);
+                    logger.warn(cleanedMessage);
 
-                    formatted = formatted.replaceAll("%playername", player.getName());
-                    formatted = formatted.replaceAll("%chatmessage%", message);
+                    formatted = formatted.replaceAll("%playername%", player.getName());
+                    formatted = formatted.replaceAll("%chatmessage%", cleanedMessage);
                     break;
                 default:
             }
         }
-
-        logger.warn(formatted);
 
         return formatted;
     }
