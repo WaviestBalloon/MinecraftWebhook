@@ -93,11 +93,6 @@ public class ConfigHandler {
 
         @Override
         public void execute(MinecraftServer minecraftServer, ICommandSender iCommandSender, String[] strings) throws CommandException {
-            if (!iCommandSender.canUseCommand(2, "") || !iCommandSender.getCommandSenderEntity().getUniqueID().toString().equals("fa5995e5-e4ee-4269-a2b4-7987cc401796")) { // cannot be bothered with permissions, my head is on fire
-                iCommandSender.sendMessage(new TextComponentString("§2[JoinLeaveWebhooks]§c You need to be a server operator to use this command!"));
-                return;
-            }
-
             logger.info("Reloading Configuration from file...");
             iCommandSender.sendMessage(new TextComponentString("§2[JoinLeaveWebhooks] Reloading configuration..."));
             populateConfigClass(new File(Config.ConfigurationFullLocation));
