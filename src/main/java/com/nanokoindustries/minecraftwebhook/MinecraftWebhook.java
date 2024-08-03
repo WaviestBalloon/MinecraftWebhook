@@ -35,6 +35,7 @@ public class MinecraftWebhook
     public static Logger logger;
     public static Boolean currentlyShuttingDown = false;
     public static Map<UUID, Long> playerPlaytimeActivity = new HashMap<UUID, Long>();
+    public static Long serverInitTimestamp;
 
     @EventHandler
     public void preInit(FMLPreInitializationEvent event) {
@@ -71,7 +72,10 @@ public class MinecraftWebhook
     }
 
     private static String formatMessageContentBasedOnLayout(String layoutMessage, Optional<Event> eventDataOptional) {
+        Long currentTimestamp = Instant.now().toEpochMilli();
         String formatted = layoutMessage.replaceAll("%epoch%", Integer.toString(getFormattedEpochForTimestampMarkdown()));
+        formatted = formatted.replaceAll("%serveruptime%", ms.format(currentTimestamp - serverInitTimestamp));
+        formatted = formatted.replaceAll("%rawserveruptime%", String.valueOf(currentTimestamp - serverInitTimestamp));
         formatted = formatted.replaceAll("\\\\n", "\n");
 
         if (eventDataOptional.isPresent()) {
@@ -88,7 +92,6 @@ public class MinecraftWebhook
                     PlayerEvent.PlayerLoggedOutEvent playerLoggedOutEvent = (PlayerEvent.PlayerLoggedOutEvent) eventData;
                     UUID playerUUID = playerLoggedOutEvent.player.getUniqueID();
                     Long currentSessionPlaytime = playerPlaytimeActivity.get(playerUUID);
-                    Long currentTimestamp = Instant.now().toEpochMilli();
 
                     formatted = formatted.replaceAll("%playername%", playerLoggedOutEvent.player.getName());
                     formatted = formatted.replaceAll("%playtime%", ms.format(currentTimestamp - currentSessionPlaytime));
@@ -137,6 +140,7 @@ public class MinecraftWebhook
 
     @EventHandler
     public void started(FMLServerStartedEvent event) {
+        serverInitTimestamp = Instant.now().toEpochMilli();
         if (!ConfigHandler.Config.TriggerOnServerInitialised) return;
 
         logger.info("Server opened event triggered!");

@@ -13,18 +13,18 @@ public class CommandHandler {
     private static final Logger logger = MinecraftWebhook.logger;
 
     public static TextComponentString createChatMessage(String message) {
-        return new TextComponentString(String.format("§2[JoinLeaveWebhooks] %s", message));
+        return new TextComponentString(String.format("§2[MinecraftWebhook] %s", message));
     }
 
     public static class ReloadCommand extends CommandBase {
         @Override
         public String getName() {
-            return "jlwreload";
+            return "mwreload";
         }
 
         @Override
         public String getUsage(ICommandSender iCommandSender) {
-            return "command.jlwreload.usage";
+            return "command.mwreload.usage";
         }
 
         @Override

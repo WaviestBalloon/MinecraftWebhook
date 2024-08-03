@@ -59,9 +59,9 @@ public class ConfigHandler {
         Config.PlayerDeathLayoutUseEmbed = configuration.getBoolean("PlayerDeathLayoutUseEmbed", category, false, "Put the above in a embed instead of a generic message");
         Config.PlayerAdvancementLayout = configuration.getString("PlayerAdvancementLayout", category, "\uD83D\uDCD5 `%playername% has made the advancement [%advancementname%]` <t:%epoch%:R>", "What to send when a player dies to something");
         Config.PlayerAdvancementLayoutUseEmbed = configuration.getBoolean("PlayerAdvancementLayoutUseEmbed", category, false, "Put the above in a embed instead of a generic message");
-        Config.ServerClosingLayout = configuration.getString("ServerClosingLayout", category, "\uD83D\uDEAA Server shutting down! <t:%epoch%:R>", "What to send when the server starts to shutdown");
+        Config.ServerClosingLayout = configuration.getString("ServerClosingLayout", category, "\uD83D\uDEAA Server shutting down! Server was online for %serveruptime% (`%rawserveruptime%ms`) <t:%epoch%:R>", "What to send when the server starts to shutdown");
         Config.ServerClosingLayoutUseEmbed = configuration.getBoolean("ServerClosingLayoutUseEmbed", category, false, "Put the above in a embed instead of a generic message");
-        Config.ServerInitialisedLayout = configuration.getString("ServerInitialisedLayout", category, "✅ Server has fully initialised! <t:%epoch%:R>", "What to send when the server has finished initialising and is ready to accept players");
+        Config.ServerInitialisedLayout = configuration.getString("ServerInitialisedLayout", category, "✅ Server ready! <t:%epoch%:R>", "What to send when the server has finished initialising and is ready to accept players");
         Config.ServerInitialisedLayoutUseEmbed = configuration.getBoolean("ServerInitialisedLayoutUseEmbed", category, false, "Put the above in a embed instead of a generic message");
 
         category = "Toggles";
@@ -89,7 +89,7 @@ public class ConfigHandler {
 
     public static File initConfig(FMLPreInitializationEvent event) {
         File modConfigurationDirectory = event.getModConfigurationDirectory().getAbsoluteFile();
-        File configurationFile = new File(modConfigurationDirectory + "/joinleavewebhooks.cfg");
+        File configurationFile = new File(modConfigurationDirectory + "/minecraftwebhook.cfg");
         Config.ConfigurationFullLocation = configurationFile.getAbsolutePath();
 
         populateConfigClass(configurationFile);
