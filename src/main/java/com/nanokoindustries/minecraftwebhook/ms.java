@@ -1,4 +1,4 @@
-package com.nanokoindustries.joinleavewebhooks;
+package com.nanokoindustries.minecraftwebhook;
 
 // Loosely from https://github.com/vercel/ms/blob/main/src/index.ts
 

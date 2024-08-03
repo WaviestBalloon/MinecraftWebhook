@@ -1,8 +1,7 @@
-package com.nanokoindustries.joinleavewebhooks;
+package com.nanokoindustries.minecraftwebhook;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentString;
 import net.minecraftforge.common.config.Config;
 import net.minecraftforge.event.ServerChatEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
@@ -22,15 +21,15 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-import static com.nanokoindustries.joinleavewebhooks.ConfigHandler.initConfig;
-import static com.nanokoindustries.joinleavewebhooks.Webhook.sendDiscordWebhookRequestThreaded;
+import static com.nanokoindustries.minecraftwebhook.ConfigHandler.initConfig;
+import static com.nanokoindustries.minecraftwebhook.Webhook.sendDiscordWebhookRequestThreaded;
 
-@Mod(modid = JoinLeaveWebhooks.MODID, name = JoinLeaveWebhooks.NAME, version = JoinLeaveWebhooks.VERSION, acceptableRemoteVersions = "*")
-@Config.LangKey("joinleavewebhooks.config.title")
-public class JoinLeaveWebhooks
+@Mod(modid = MinecraftWebhook.MODID, name = MinecraftWebhook.NAME, version = MinecraftWebhook.VERSION, acceptableRemoteVersions = "*")
+@Config.LangKey("minecraftwebhook.config.title")
+public class MinecraftWebhook
 {
-    public static final String MODID = "joinleavewebhooks";
-    public static final String NAME = "Join+Leave+ServerState+Chat Discord Webhook";
+    public static final String MODID = "minecraftwebhook";
+    public static final String NAME = "MinecraftWebhook";
     public static final String VERSION = "1.0";
 
     public static Logger logger;
@@ -46,8 +45,7 @@ public class JoinLeaveWebhooks
 
     @EventHandler
     public void init(FMLInitializationEvent event) {
-        logger.info("[NanokoIndustries] Join+Leave+ServerState+Chat Discord Webhook mod initialised!");
-        logger.info("Mod created by Nanoko Industries - Leaders in, making crappy mods? I have no idea...");
+        logger.info("MinecraftWebhook initialised!");
 
         if (ConfigHandler.Config.DiscordWebhookToken.isEmpty()) {
             logger.error("The webhook URL is empty! Edit your configuration file located in the \"config\" folder in the server files");
@@ -58,7 +56,6 @@ public class JoinLeaveWebhooks
     public void commandSetup(FMLServerStartingEvent event) {
         logger.info("Registering server commands...");
         event.registerServerCommand(new CommandHandler.ReloadCommand());
-
     }
 
     private static int getFormattedEpochForTimestampMarkdown() {
@@ -117,8 +114,6 @@ public class JoinLeaveWebhooks
                         cleanedMessage = cleanedMessage.replaceAll("~", "\\\\\\\\~");
                         cleanedMessage = cleanedMessage.replaceAll("_", "\\\\\\\\_");
                     }
-                    logger.warn(message);
-                    logger.warn(cleanedMessage);
 
                     formatted = formatted.replaceAll("%playername%", player.getName());
                     formatted = formatted.replaceAll("%chatmessage%", cleanedMessage);

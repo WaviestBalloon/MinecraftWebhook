@@ -1,11 +1,9 @@
-package com.nanokoindustries.joinleavewebhooks;
+package com.nanokoindustries.minecraftwebhook;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import org.apache.logging.log4j.Logger;
-import scala.Array;
-import scala.util.parsing.json.JSON;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -19,7 +17,7 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 public class Webhook {
-    private static final Logger logger = JoinLeaveWebhooks.logger;
+    private static final Logger logger = MinecraftWebhook.logger;
 
     private static void verboseLog(String message) {
         if (ConfigHandler.Config.EnableWebhookHandlerDebugging) {

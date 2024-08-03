@@ -1,19 +1,13 @@
-package com.nanokoindustries.joinleavewebhooks;
+package com.nanokoindustries.minecraftwebhook;
 
-import net.minecraft.command.CommandBase;
-import net.minecraft.command.CommandException;
-import net.minecraft.command.ICommandSender;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.text.TextComponentString;
 import net.minecraftforge.common.config.Configuration;
-import net.minecraftforge.fml.common.Optional;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 
 public class ConfigHandler {
-    private static final Logger logger = JoinLeaveWebhooks.logger;
+    private static final Logger logger = MinecraftWebhook.logger;
 
     public static class Config {
         public static String ConfigurationFullLocation;

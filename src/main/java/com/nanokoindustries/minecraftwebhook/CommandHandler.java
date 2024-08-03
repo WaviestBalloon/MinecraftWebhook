@@ -1,4 +1,4 @@
-package com.nanokoindustries.joinleavewebhooks;
+package com.nanokoindustries.minecraftwebhook;
 
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
@@ -10,7 +10,7 @@ import org.apache.logging.log4j.Logger;
 import java.io.File;
 
 public class CommandHandler {
-    private static final Logger logger = JoinLeaveWebhooks.logger;
+    private static final Logger logger = MinecraftWebhook.logger;
 
     public static TextComponentString createChatMessage(String message) {
         return new TextComponentString(String.format("§2[JoinLeaveWebhooks] %s", message));
