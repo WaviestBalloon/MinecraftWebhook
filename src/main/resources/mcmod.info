@@ -1,11 +1,11 @@
 [
 {
-  "modid": "joinleavewebhooks",
-  "name": "Join+Leave+ServerState+Chat Discord Webhook",
-  "description": "A mod to relay player joins, leaving, chatting and also when the server is available to join or if the server is closing",
+  "modid": "minecraftwebhook",
+  "name": "MinecraftWebhook",
+  "description": "A simple, customisable mod to relay player joins, leaving, chatting and also server states via a Discord webhook",
   "version": "${version}",
   "mcversion": "${mcversion}",
-  "url": "",
+  "url": "https://modrinth.com/project/minecraftwebhook",
   "updateUrl": "",
   "authorList": ["waviestballoonx9"],
   "credits": "The Forge and FML guys",
