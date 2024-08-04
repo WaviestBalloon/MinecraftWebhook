@@ -173,6 +173,11 @@ public class MinecraftWebhook
         @SubscribeEvent
         public static void onPlayerLeave(PlayerEvent.PlayerLoggedOutEvent event) {
             if (!ConfigHandler.Config.TriggerOnPlayerLeave || currentlyShuttingDown) return;
+            if (!playerPlaytimeActivity.containsKey(event.player.getUniqueID())) {
+                logger.warn(String.format("PlayerLoggedOutEvent was called on player `%s` but they are not in the playerPlaytimeActivity HashMap!", event.player.getUniqueID()));
+                return;
+            }
+
             sendDiscordWebhookRequestThreaded(formatMessageContentBasedOnLayout(ConfigHandler.Config.PlayerLeaveLayout, Optional.of(event)), Optional.of(ConfigHandler.Config.PlayerLeaveLayoutUseEmbed), Optional.of(event.player.getUniqueID()), Optional.empty());
         }
 
