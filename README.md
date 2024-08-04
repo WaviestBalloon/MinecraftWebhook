@@ -1,7 +1,7 @@
 # <img src="assets/logo.png" width=85px> MinecraftWebhook
 ### MinecraftWebhook is a easy to use and customisable mod that relays in-game events to a Discord Webhook.
 
-[Download a release on Modrinth](https://modrinth.com/mod/minecraftwebhook/versions#all-versions)
+<a href="https://modrinth.com/mod/minecraftwebhook/versions#all-versions"><img src="https://raw.githubusercontent.com/intergrav/devins-badges/v3/assets/cozy/available/modrinth_64h.png" width=165px></a>
 
 *You can relay:*
 - Player joins
