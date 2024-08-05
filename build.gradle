@@ -14,8 +14,8 @@ apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 
 version = '1.0'
-group = 'com.nanokoindustries.joinleavewebhooks' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = 'joinleavewebhooks'
+group = 'com.nanokoindustries.minecraftwebhook' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
+archivesBaseName = 'minecraftwebhook'
 
 sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
 
